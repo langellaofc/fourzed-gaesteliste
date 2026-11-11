@@ -5,7 +5,7 @@
 window.GAESTELISTE_CONFIG = {
   // URL der veröffentlichten Google-Apps-Script-Web-App (endet auf /exec).
   // Siehe README, Abschnitt "Backend einrichten".
-  WEB_APP_URL: "",
+  WEB_APP_URL: "https://script.google.com/macros/s/AKfycbzktzgqQjfvP-3tLIPJ02qynfATsWY0h12mSLOOhq1pY_iCX4oy7rgqxiWFhGACLl8RmA/exec",
 
   // Mindestalter am Eventtag. Muss mit MIN_AGE in apps-script/Code.gs übereinstimmen.
   MIN_AGE: 18,
