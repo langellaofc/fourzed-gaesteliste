@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0b0b0d">
+  <title>Gästeliste · FourZed x F32 x sync. Community Pop-up</title>
+  <meta name="description" content="Anmeldung zur Gästeliste: FourZed x F32 x sync. Community Pop-up, 14.11.2026, Praterinsel 3, München.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0b0d'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23fea7f2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+  <div class="page">
+    <header class="site-header">
+      <ul class="partner-logos" aria-label="Veranstalter">
+        <li><img class="logo-fourzed" src="assets/logo-fourzed.png" alt="FourZed" width="360" height="77"></li>
+        <li class="x" aria-hidden="true">×</li>
+        <li><img class="logo-f32" src="assets/logo-f32.png" alt="F32" width="140" height="153"></li>
+        <li class="x" aria-hidden="true">×</li>
+        <li><img class="logo-sync" src="assets/logo-sync.png" alt="sync." width="280" height="113"></li>
+      </ul>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="event-title">
+        <h1 id="event-title" class="headline"><span class="visually-hidden">FourZed x F32 x sync. </span><img src="assets/headline-community-popup.png" alt="Community Pop-up" width="840" height="382"></h1>
+        <p class="eyebrow">Private Party · Nur mit Gästeliste</p>
+        <dl class="event-meta">
+          <div>
+            <dt>Datum</dt>
+            <dd><time datetime="2026-11-14">Samstag, 14.11.2026</time></dd>
+          </div>
+          <div>
+            <dt>Uhrzeit</dt>
+            <dd><time datetime="2026-11-14T19:00">19:00</time> bis <time datetime="2026-11-14T22:00">22:00</time> Uhr</dd>
+          </div>
+          <div>
+            <dt>Ort</dt>
+            <dd>Praterinsel 3, 80538 München</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="card" id="signup" aria-labelledby="form-title">
+        <h2 id="form-title">Auf die Gästeliste</h2>
+        <p class="lead">Trag dich ein, um auf die Gästeliste zu kommen. Alle Felder außer dem Newsletter sind Pflichtfelder.</p>
+
+        <noscript>
+          <p class="notice notice--error">Bitte aktiviere JavaScript, um dich für die Gästeliste anzumelden.</p>
+        </noscript>
+
+        <form id="signup-form" novalidate>
+          <div class="row">
+            <div class="field">
+              <label for="firstName">Vorname</label>
+              <input id="firstName" name="firstName" type="text" autocomplete="given-name" maxlength="60" required aria-describedby="firstName-error">
+              <p class="field-error" id="firstName-error" aria-live="polite"></p>
+            </div>
+            <div class="field">
+              <label for="lastName">Nachname</label>
+              <input id="lastName" name="lastName" type="text" autocomplete="family-name" maxlength="60" required aria-describedby="lastName-error">
+              <p class="field-error" id="lastName-error" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="birthdate">Geburtsdatum</label>
+            <input id="birthdate" name="birthdate" type="date" autocomplete="bday" min="1900-01-01" required aria-describedby="birthdate-hint birthdate-error">
+            <p class="field-hint" id="birthdate-hint">Du musst am Eventtag mindestens <span data-min-age>18</span> Jahre alt sein.</p>
+            <p class="field-error" id="birthdate-error" aria-live="polite"></p>
+          </div>
+
+          <div class="field">
+            <label for="email">E-Mail-Adresse</label>
+            <input id="email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" spellcheck="false" autocapitalize="off" required aria-describedby="email-error">
+            <p class="field-error" id="email-error" aria-live="polite"></p>
+          </div>
+
+          <div class="field">
+            <label for="via">Über wen kommst du?</label>
+            <div class="select-wrap">
+              <select id="via" name="via" required aria-describedby="via-error">
+                <option value="" selected disabled>Bitte auswählen</option>
+                <option value="sync.">sync.</option>
+                <option value="F32">F32</option>
+                <option value="FourZed">FourZed</option>
+              </select>
+            </div>
+            <p class="field-error" id="via-error" aria-live="polite"></p>
+          </div>
+
+          <!-- Honeypot gegen Spam-Bots: für Menschen unsichtbar, bitte nicht entfernen. -->
+          <div class="hp" aria-hidden="true">
+            <label for="website">Website (bitte leer lassen)</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+          </div>
+
+          <div class="field field--check">
+            <input id="newsletter" name="newsletter" type="checkbox">
+            <label for="newsletter">Ich möchte den Newsletter von FourZed per E-Mail erhalten. <span class="optional">(optional)</span></label>
+          </div>
+
+          <div class="field field--check">
+            <input id="consent" name="consent" type="checkbox" required aria-describedby="consent-error">
+            <label for="consent">Ich willige ein, dass meine Angaben zur Organisation der Gästeliste gespeichert und verarbeitet werden. Details findest du in der <a href="datenschutz.html" target="_blank" rel="noopener">Datenschutzerklärung<span class="visually-hidden"> (öffnet in neuem Tab)</span></a>.</label>
+            <p class="field-error" id="consent-error" aria-live="polite"></p>
+          </div>
+
+          <div id="form-status" class="notice" role="alert" hidden></div>
+
+          <button type="submit" class="btn btn--primary" id="submit-btn">
+            <span class="btn-spinner" aria-hidden="true"></span>
+            <span class="btn-label">Jetzt anmelden</span>
+          </button>
+        </form>
+      </section>
+
+      <section class="card success" id="success" hidden aria-labelledby="success-title">
+        <div class="success-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="28" height="28"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h2 id="success-title" tabindex="-1">Du stehst auf der Gästeliste!</h2>
+        <p class="lead" id="success-text">Wir freuen uns auf dich.</p>
+        <dl class="event-meta event-meta--compact">
+          <div>
+            <dt>Event</dt>
+            <dd>FourZed x F32 x sync. Community Pop-up</dd>
+          </div>
+          <div>
+            <dt>Wann</dt>
+            <dd>Samstag, 14.11.2026, 19:00 bis 22:00 Uhr</dd>
+          </div>
+          <div>
+            <dt>Wo</dt>
+            <dd>Praterinsel 3, 80538 München</dd>
+          </div>
+        </dl>
+        <button type="button" class="btn btn--primary" id="ics-btn">Zum Kalender hinzufügen</button>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <nav aria-label="Rechtliches">
+        <a href="datenschutz.html">Datenschutz</a>
+      </nav>
+    </footer>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
