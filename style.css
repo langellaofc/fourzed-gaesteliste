@@ -4,8 +4,8 @@
    ========================================================================== */
 
 :root {
-  --accent: #fea7f2;          /* Akzentfarbe (Pink aus dem Pop-up-Schriftzug) */
-  --accent-rgb: 254, 167, 242; /* gleiche Farbe als RGB für Transparenzen */
+  --accent: #ff3130;          /* Akzentfarbe (Rot aus dem "SESSION"-Schriftzug) */
+  --accent-rgb: 255, 49, 48;  /* gleiche Farbe als RGB für Transparenzen */
   --accent-contrast: #0b0b0d; /* Textfarbe auf Akzent */
 
   --bg: #0b0b0d;
@@ -17,8 +17,8 @@
   --field-border: #70707e;   /* min. 3:1 Kontrast zum Feld */
   --text: #f4f4f6;
   --text-muted: #a9a9b6;
-  --error: #ff8a5c;
-  --error-bg: rgba(255, 138, 92, 0.1);
+  --error: #ffb547;           /* Bernstein, damit Fehler sich vom roten Akzent abheben */
+  --error-bg: rgba(255, 181, 71, 0.1);
   --success: var(--accent);
 
   --radius: 14px;

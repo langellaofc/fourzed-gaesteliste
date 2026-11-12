@@ -23,13 +23,16 @@ const MIN_AGE = 18;
 /** Eventdatum (JJJJ-MM-TT) für die Altersprüfung. */
 const EVENT_DATE = '2026-11-14';
 
-/** Maximale Anzahl Gäste. 0 = unbegrenzt. */
+/** Maximale Anzahl Gäste inkl. Begleitpersonen. 0 = unbegrenzt. */
 const MAX_GUESTS = 0;
 
 /** Erlaubte Werte für "Über wen kommst du?". */
 const VIA_OPTIONS = ['sync.', 'F32', 'FourZed'];
 
-const HEADERS = ['Zeitstempel', 'Vorname', 'Nachname', 'Geburtsdatum', 'E-Mail', 'Kommt über', 'Newsletter'];
+/** Maximale Anzahl Begleitpersonen pro Anmeldung. */
+const MAX_COMPANIONS = 5;
+
+const HEADERS = ['Zeitstempel', 'Vorname', 'Nachname', 'Geburtsdatum', 'E-Mail', 'Kommt über', 'Newsletter', 'Begleitpersonen'];
 const EMAIL_COLUMN = 5; // Spalte E
 const NAME_MAX = 60;
 const EMAIL_RE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)*\.[^\s@.]{2,}$/;
@@ -84,8 +87,15 @@ function doPost(e) {
       }
     }
 
-    if (MAX_GUESTS > 0 && count >= MAX_GUESTS) {
-      return json_({ ok: false, code: 'FULL', message: 'Die Gästeliste ist leider voll.' });
+    if (MAX_GUESTS > 0) {
+      let total = 0;
+      if (count > 0) {
+        const companions = sheet.getRange(2, HEADERS.length, count, 1).getValues();
+        for (let i = 0; i < companions.length; i++) total += 1 + (Number(companions[i][0]) || 0);
+      }
+      if (total + 1 + guest.guests > MAX_GUESTS) {
+        return json_({ ok: false, code: 'FULL', message: 'Die Gästeliste ist leider voll.' });
+      }
     }
 
     sheet.appendRow([
@@ -95,7 +105,8 @@ function doPost(e) {
       "'" + guest.birthdateDisplay, // immer als Text speichern
       safe_(guest.email),
       safe_(guest.via),
-      guest.newsletter ? 'Ja' : 'Nein'
+      guest.newsletter ? 'Ja' : 'Nein',
+      guest.guests
     ]);
     SpreadsheetApp.flush();
 
@@ -158,6 +169,11 @@ function validate_(d) {
     return { field: 'via', error: 'Bitte wähle aus, über wen du kommst.' };
   }
 
+  const guests = d.guests === undefined ? 0 : d.guests;
+  if (typeof guests !== 'number' || guests % 1 !== 0 || guests < 0 || guests > MAX_COMPANIONS) {
+    return { field: 'guests', error: 'Bitte wähle die Anzahl deiner Begleitpersonen (0 bis ' + MAX_COMPANIONS + ').' };
+  }
+
   if (d.consent !== true) {
     return { field: 'consent', error: 'Bitte stimme der Speicherung deiner Daten zu.' };
   }
@@ -169,7 +185,8 @@ function validate_(d) {
       birthdateDisplay: pad_(b.d) + '.' + pad_(b.m) + '.' + b.y,
       email: email,
       via: via,
-      newsletter: d.newsletter === true
+      newsletter: d.newsletter === true,
+      guests: guests
     }
   };
 }
@@ -217,6 +234,9 @@ function getSheet_() {
     sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]).setFontWeight('bold');
     sheet.setFrozenRows(1);
     sheet.getRange('A:A').setNumberFormat('dd.MM.yyyy HH:mm:ss');
+  } else if (sheet.getRange(1, HEADERS.length).getValue() === '') {
+    // Bestehende Tabelle: neue Spalte "Begleitpersonen" in der Kopfzeile ergänzen
+    sheet.getRange(1, HEADERS.length).setValue(HEADERS[HEADERS.length - 1]).setFontWeight('bold');
   }
   return sheet;
 }

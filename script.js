@@ -24,6 +24,7 @@
     birthdate: document.getElementById("birthdate"),
     email: document.getElementById("email"),
     via: document.getElementById("via"),
+    guests: document.getElementById("guests"),
     consent: document.getElementById("consent")
   };
   var newsletterEl = document.getElementById("newsletter");
@@ -121,6 +122,9 @@
     },
     via: function () {
       return VIA_OPTIONS.indexOf(fields.via.value) === -1 ? "Bitte wähle aus, über wen du kommst." : "";
+    },
+    guests: function () {
+      return /^[0-5]$/.test(fields.guests.value) ? "" : "Bitte wähle die Anzahl deiner Begleitpersonen.";
     },
     consent: function () {
       return fields.consent.checked ? "" : "Bitte stimme der Speicherung deiner Daten zu, um dich anzumelden.";
@@ -231,6 +235,7 @@
       birthdate: fields.birthdate.value,
       email: fields.email.value.trim().toLowerCase(),
       via: fields.via.value,
+      guests: parseInt(fields.guests.value, 10) || 0,
       newsletter: !!newsletterEl.checked,
       consent: !!fields.consent.checked,
       website: honeypotEl.value
@@ -388,7 +393,7 @@
     var lines = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//Gaesteliste//Community Pop-up//DE",
+      "PRODID:-//Gaesteliste//Secret Session//DE",
       "CALSCALE:GREGORIAN",
       "METHOD:PUBLISH",
       "BEGIN:VTIMEZONE",

@@ -16,7 +16,7 @@ window.GAESTELISTE_CONFIG = {
   // Eventdaten (für Altersprüfung und Kalenderdatei .ics).
   // Wenn du hier etwas änderst, passe auch den Text in index.html an.
   EVENT: {
-    title: "FourZed x F32 x sync. Community Pop-up",
+    title: "FourZed x F32 x sync. Secret Session",
     date: "2026-11-14",      // JJJJ-MM-TT
     startTime: "19:00",      // HH:MM, Ortszeit
     endTime: "22:00",        // HH:MM, Ortszeit

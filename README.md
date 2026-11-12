@@ -1,4 +1,4 @@
-# Gästeliste – FourZed x F32 x sync. Community Pop-up
+# Gästeliste – FourZed x F32 x sync. Secret Session
 
 Anmeldeseite für die Gästeliste der privaten Party am **Samstag, 14.11.2026, 19:00 bis 22:00 Uhr**, Praterinsel 3, 80538 München.
 
@@ -15,7 +15,7 @@ Anmeldeseite für die Gästeliste der privaten Party am **Samstag, 14.11.2026, 1
 | `script.js` | Validierung, Absenden, Kalenderdatei (.ics) |
 | `config.js` | **Web-App-URL**, Mindestalter, Eventdaten |
 | `datenschutz.html` | Datenschutzerklärung (**Verantwortlicher muss noch eingetragen werden**) |
-| `assets/` | Logos (FourZed, F32, sync.), Schriftzug „Community Pop-up“, Hintergrundbild |
+| `assets/` | Logos (FourZed, F32, sync.), Schriftzug „Secret Session“, Hintergrundbild |
 | `apps-script/Code.gs` | Backend für Google Apps Script |
 
 ---
@@ -25,10 +25,10 @@ Anmeldeseite für die Gästeliste der privaten Party am **Samstag, 14.11.2026, 1
 ### 1. Google Sheet anlegen
 
 1. Öffne <https://sheets.new> (mit dem Google-Konto, dem die Daten gehören sollen).
-2. Gib der Tabelle einen Namen, z. B. `Gästeliste Community Pop-up`.
+2. Gib der Tabelle einen Namen, z. B. `Gästeliste Secret Session`.
 3. **Datei → Einstellungen → Allgemein → Zeitzone:** `(GMT+01:00) Berlin` wählen und speichern.
 
-Das Tabellenblatt `Gästeliste` mit den Spalten *Zeitstempel, Vorname, Nachname, Geburtsdatum, E-Mail, Kommt über, Newsletter* wird automatisch angelegt.
+Das Tabellenblatt `Gästeliste` mit den Spalten *Zeitstempel, Vorname, Nachname, Geburtsdatum, E-Mail, Kommt über, Newsletter, Begleitpersonen* wird automatisch angelegt.
 
 ### 2. Apps Script einfügen
 
@@ -37,7 +37,7 @@ Das Tabellenblatt `Gästeliste` mit den Spalten *Zeitstempel, Vorname, Nachname,
 3. Oben ggf. die Konstanten anpassen:
    - `MIN_AGE` (Standard 18, **muss mit `MIN_AGE` in `config.js` übereinstimmen**)
    - `EVENT_DATE` (Standard `2026-11-14`)
-   - `MAX_GUESTS` (Standard `0` = unbegrenzt)
+   - `MAX_GUESTS` (Standard `0` = unbegrenzt, zählt Begleitpersonen mit)
 4. Speichern (Disketten-Symbol oder `Cmd/Strg + S`).
 5. Links auf **Projekteinstellungen (Zahnrad)** → **Zeitzone**: `(GMT+01:00) Berlin` einstellen.
 
@@ -83,10 +83,11 @@ So bleibt die URL gleich. (Eine *neue* Bereitstellung würde eine neue URL erzeu
 |---|---|
 | Web-App-URL | `config.js` → `WEB_APP_URL` |
 | Mindestalter | `config.js` → `MIN_AGE` **und** `Code.gs` → `MIN_AGE` |
-| Max. Gäste | `Code.gs` → `MAX_GUESTS` (0 = unbegrenzt) |
+| Max. Gäste (inkl. Begleitpersonen) | `Code.gs` → `MAX_GUESTS` (0 = unbegrenzt) |
+| Max. Begleitpersonen pro Anmeldung | `Code.gs` → `MAX_COMPANIONS` **und** Dropdown in `index.html` |
 | Eventdaten (Kalenderdatei, Altersprüfung) | `config.js` → `EVENT` und `Code.gs` → `EVENT_DATE` |
 | Eventtexte auf der Seite | `index.html` |
-| Akzentfarbe (Pink) | `style.css` → `--accent` und `--accent-rgb` |
+| Akzentfarbe (Rot) | `style.css` → `--accent` und `--accent-rgb` |
 | Logos / Hintergrund | Dateien in `assets/` ersetzen (gleicher Dateiname), Logo-Höhen in `style.css` unter `.partner-logos` |
 
 ## Funktionen
