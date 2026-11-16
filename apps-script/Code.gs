@@ -40,7 +40,11 @@ const INTERN_SHEET_NAME = 'Intern';
 /** Schlüssel, den die interne Seite mitschickt (steht auch in deren config.js). */
 const INTERN_KEY = 'GBJ7JTMCC_XWkspLVE2SQ4L8';
 
-const INTERN_HEADERS = ['Zeitstempel', 'Name', 'Eingetragen von'];
+const INTERN_HEADERS = ['Zeitstempel', 'Name', 'Begleitpersonen', 'Liste', 'Eingetragen von'];
+
+/** Die beiden internen Listen: Schlüssel (von der Seite) → Bezeichnung im Sheet. */
+const INTERN_LISTS = { guest: 'Gästeliste', friends: 'Friendslist' };
+const INTERN_MAX_COMPANIONS = 5;
 const INTERN_NAME_MAX = 80;
 const INTERN_BY_MAX = 40;
 const INTERN_MAX_ENTRIES = 3000;
@@ -157,6 +161,12 @@ function internAdd_(d) {
 
   const name = cleanString_(d.name);
   const by = cleanString_(d.by);
+  const list = typeof d.list === 'string' && INTERN_LISTS.hasOwnProperty(d.list) ? d.list : '';
+  const companions = d.companions === undefined ? 0 : d.companions;
+  if (!list) return json_({ ok: false, code: 'INVALID', field: 'list', message: 'Bitte wähle eine Liste.' });
+  if (typeof companions !== 'number' || companions % 1 !== 0 || companions < 0 || companions > INTERN_MAX_COMPANIONS) {
+    return json_({ ok: false, code: 'INVALID', field: 'companions', message: 'Begleitpersonen: 0 bis ' + INTERN_MAX_COMPANIONS + '.' });
+  }
   if (!name) return json_({ ok: false, code: 'INVALID', field: 'name', message: 'Bitte gib einen Namen ein.' });
   if (name.length > INTERN_NAME_MAX) {
     return json_({ ok: false, code: 'INVALID', field: 'name', message: 'Der Name ist zu lang (max. ' + INTERN_NAME_MAX + ' Zeichen).' });
@@ -178,16 +188,17 @@ function internAdd_(d) {
     const key = internNormalize_(name);
     for (let i = 0; i < entries.length; i++) {
       if (internNormalize_(entries[i].name) === key) {
-        return json_({ ok: false, code: 'DUPLICATE', message: name + ' steht schon auf der Liste.', entries: entries });
+        return json_({ ok: false, code: 'DUPLICATE', list: entries[i].list,
+          message: name + ' steht schon auf der ' + INTERN_LISTS[entries[i].list] + '.', entries: entries });
       }
     }
     if (entries.length >= INTERN_MAX_ENTRIES) {
       return json_({ ok: false, code: 'FULL', message: 'Die Liste ist voll.' });
     }
     const now = new Date();
-    sheet.appendRow([now, safe_(name), safe_(by)]);
+    sheet.appendRow([now, safe_(name), companions, INTERN_LISTS[list], safe_(by)]);
     SpreadsheetApp.flush();
-    entries.push({ name: name, by: by, ts: now.getTime() });
+    entries.push({ name: name, companions: companions, list: list, by: by, ts: now.getTime() });
     return json_({ ok: true, entries: entries });
   } catch (err) {
     console.error(err);
@@ -206,7 +217,14 @@ function internEntries_(sheet) {
     const name = String(rows[i][1] == null ? '' : rows[i][1]).replace(/^'/, '').trim();
     if (!name) continue; // im Sheet gelöschte Zeilen überspringen
     const ts = rows[i][0] instanceof Date ? rows[i][0].getTime() : null;
-    out.push({ name: name, by: String(rows[i][2] == null ? '' : rows[i][2]).replace(/^'/, '').trim(), ts: ts });
+    const label = String(rows[i][3] == null ? '' : rows[i][3]).trim();
+    out.push({
+      name: name,
+      companions: Math.max(0, Math.min(99, Math.floor(Number(rows[i][2]) || 0))),
+      list: label === INTERN_LISTS.friends ? 'friends' : 'guest',
+      by: String(rows[i][4] == null ? '' : rows[i][4]).replace(/^'/, '').trim(),
+      ts: ts
+    });
   }
   return out;
 }
