@@ -44,7 +44,7 @@ const INTERN_HEADERS = ['Zeitstempel', 'Name', 'Begleitpersonen', 'Liste', 'Eing
 
 /** Die beiden internen Listen: Schlüssel (von der Seite) → Bezeichnung im Sheet. */
 const INTERN_LISTS = { guest: 'Gästeliste', friends: 'Friendslist' };
-const INTERN_MAX_COMPANIONS = 5;
+const INTERN_MAX_COMPANIONS = 50;
 const INTERN_NAME_MAX = 80;
 const INTERN_BY_MAX = 40;
 const INTERN_MAX_ENTRIES = 3000;
