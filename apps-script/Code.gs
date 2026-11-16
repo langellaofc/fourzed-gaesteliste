@@ -32,6 +32,21 @@ const VIA_OPTIONS = ['sync.', 'F32', 'FourZed'];
 /** Maximale Anzahl Begleitpersonen pro Anmeldung. */
 const MAX_COMPANIONS = 5;
 
+// --- Interne Gästeliste (sync-gaesteliste) -------------------------------
+
+/** Tabellenblatt für die interne Gästeliste. Wird automatisch angelegt. */
+const INTERN_SHEET_NAME = 'Intern';
+
+/** Schlüssel, den die interne Seite mitschickt (steht auch in deren config.js). */
+const INTERN_KEY = 'GBJ7JTMCC_XWkspLVE2SQ4L8';
+
+const INTERN_HEADERS = ['Zeitstempel', 'Name', 'Eingetragen von'];
+const INTERN_NAME_MAX = 80;
+const INTERN_BY_MAX = 40;
+const INTERN_MAX_ENTRIES = 3000;
+
+// ---------------------------------------------------------------------------
+
 const HEADERS = ['Zeitstempel', 'Vorname', 'Nachname', 'Geburtsdatum', 'E-Mail', 'Kommt über', 'Newsletter', 'Begleitpersonen'];
 const EMAIL_COLUMN = 5; // Spalte E
 const NAME_MAX = 60;
@@ -42,7 +57,17 @@ const EMAIL_RE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)*\.[^\s@.]{2,}$/;
 // ---------------------------------------------------------------------------
 
 /** Statusprüfung: Aufruf der /exec-URL im Browser zeigt, ob die Web-App läuft. */
-function doGet() {
+function doGet(e) {
+  const p = (e && e.parameter) || {};
+  if (p.action === 'intern_list') {
+    if (p.key !== INTERN_KEY) return json_({ ok: false, code: 'FORBIDDEN', message: 'Kein Zugriff.' });
+    try {
+      return json_({ ok: true, entries: internEntries_(getInternSheet_()) });
+    } catch (err) {
+      console.error(err);
+      return json_({ ok: false, code: 'SERVER_ERROR', message: 'Liste konnte nicht geladen werden.' });
+    }
+  }
   return json_({ ok: true, status: 'online' });
 }
 
@@ -55,6 +80,10 @@ function doPost(e) {
     if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('not an object');
   } catch (err) {
     return json_({ ok: false, code: 'BAD_REQUEST', message: 'Ungültige Anfrage.' });
+  }
+
+  if (data.action === 'intern_add') {
+    return internAdd_(data);
   }
 
   // Honeypot: Bots füllen das versteckte Feld aus. Wir tun so, als hätte alles geklappt.
@@ -117,6 +146,85 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+// ---------------------------------------------------------------------------
+// Interne Gästeliste
+// ---------------------------------------------------------------------------
+
+function internAdd_(d) {
+  if (d.key !== INTERN_KEY) return json_({ ok: false, code: 'FORBIDDEN', message: 'Kein Zugriff.' });
+
+  const name = cleanString_(d.name);
+  const by = cleanString_(d.by);
+  if (!name) return json_({ ok: false, code: 'INVALID', field: 'name', message: 'Bitte gib einen Namen ein.' });
+  if (name.length > INTERN_NAME_MAX) {
+    return json_({ ok: false, code: 'INVALID', field: 'name', message: 'Der Name ist zu lang (max. ' + INTERN_NAME_MAX + ' Zeichen).' });
+  }
+  if (by.length > INTERN_BY_MAX) {
+    return json_({ ok: false, code: 'INVALID', field: 'by', message: 'Das Feld "Von" ist zu lang (max. ' + INTERN_BY_MAX + ' Zeichen).' });
+  }
+  if (/[\u0000-\u001F\u007F<>]/.test(name + by)) {
+    return json_({ ok: false, code: 'INVALID', field: 'name', message: 'Bitte keine Sonderzeichen wie < oder > verwenden.' });
+  }
+
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(15000)) {
+    return json_({ ok: false, code: 'BUSY', message: 'Gerade ist viel los. Bitte versuche es gleich erneut.' });
+  }
+  try {
+    const sheet = getInternSheet_();
+    const entries = internEntries_(sheet);
+    const key = internNormalize_(name);
+    for (let i = 0; i < entries.length; i++) {
+      if (internNormalize_(entries[i].name) === key) {
+        return json_({ ok: false, code: 'DUPLICATE', message: name + ' steht schon auf der Liste.', entries: entries });
+      }
+    }
+    if (entries.length >= INTERN_MAX_ENTRIES) {
+      return json_({ ok: false, code: 'FULL', message: 'Die Liste ist voll.' });
+    }
+    const now = new Date();
+    sheet.appendRow([now, safe_(name), safe_(by)]);
+    SpreadsheetApp.flush();
+    entries.push({ name: name, by: by, ts: now.getTime() });
+    return json_({ ok: true, entries: entries });
+  } catch (err) {
+    console.error(err);
+    return json_({ ok: false, code: 'SERVER_ERROR', message: 'Beim Speichern ist ein Fehler aufgetreten.' });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function internEntries_(sheet) {
+  const count = Math.max(0, sheet.getLastRow() - 1);
+  if (count === 0) return [];
+  const rows = sheet.getRange(2, 1, count, INTERN_HEADERS.length).getValues();
+  const out = [];
+  for (let i = 0; i < rows.length; i++) {
+    const name = String(rows[i][1] == null ? '' : rows[i][1]).replace(/^'/, '').trim();
+    if (!name) continue; // im Sheet gelöschte Zeilen überspringen
+    const ts = rows[i][0] instanceof Date ? rows[i][0].getTime() : null;
+    out.push({ name: name, by: String(rows[i][2] == null ? '' : rows[i][2]).replace(/^'/, '').trim(), ts: ts });
+  }
+  return out;
+}
+
+function internNormalize_(v) {
+  return String(v).replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+function getInternSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(INTERN_SHEET_NAME);
+  if (!sheet) sheet = ss.insertSheet(INTERN_SHEET_NAME);
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, INTERN_HEADERS.length).setValues([INTERN_HEADERS]).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+    sheet.getRange('A:A').setNumberFormat('dd.MM.yyyy HH:mm:ss');
+  }
+  return sheet;
 }
 
 /**
